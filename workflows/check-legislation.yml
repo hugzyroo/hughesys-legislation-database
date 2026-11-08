@@ -1,0 +1,29 @@
+name: Check 26 NT Acts for updates (review required)
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '15 1 * * *'
+permissions:
+  contents: read
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - run: pip install -r requirements.txt
+      - name: Check official consolidated legislation
+        run: python update_legislation.py
+      - name: Upload candidate and report for review
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legislation-review-${{ github.run_number }}
+          path: |
+            candidate_index.html
+            candidate_report.json
+          if-no-files-found: warn
+          retention-days: 30
