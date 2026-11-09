@@ -6,6 +6,7 @@ A successful source check is NOT verification of the app's stored provisions.
 import argparse
 import datetime as dt
 import hashlib
+import html
 import json
 import re
 import sys
@@ -46,27 +47,59 @@ def catalog(session):
     return found
 
 def pdf_link(session, detail_url):
+    """Look for PDFs in ordinary links and embedded viewer metadata."""
     response = fetch(session, detail_url)
     if response.content.startswith(b'%PDF'):
         return response.url, response.content
     soup = BeautifulSoup(response.text, 'html.parser')
-    candidates = []
-    for a in soup.select('a[href]'):
-        url = urljoin(detail_url, a['href'])
-        label = a.get_text(' ', strip=True).lower()
+    candidates = {}
+
+    def add(value, label=''):
+        value = html.unescape(str(value)).replace('\\/', '/').strip().strip('"\'')
+        if not value or value.startswith(('javascript:', 'data:', '#')):
+            return
+        url = urljoin(detail_url, value)
         if urlparse(url).hostname != 'legislation.nt.gov.au':
-            continue
-        if '.pdf' in url.lower() or 'pdfversion' in label or 'pdf' == label:
-            score = (3 if 'current' in label or 'in force' in label else 0) + (2 if 'consolidat' in label else 0) + (1 if '.pdf' in url.lower() else 0)
-            candidates.append((score, url))
+            return
+        low = url.lower()
+        if any(x in low for x in ('/bill/', '/bills/', 'act%20history', '/history/')):
+            return
+        if not ('.pdf' in low or 'pdfversion' in low or 'pdfdownload' in low
+                or '/api/sitecore/' in low and ('pdf' in low or 'download' in low)):
+            return
+        score = (3 if 'current' in label.lower() or 'in force' in label.lower() else 0)
+        score += 2 if 'consolidat' in label.lower() else 0
+        score += 1 if '.pdf' in low else 0
+        candidates[url] = max(score, candidates.get(url, -1))
+
+    for element in soup.find_all(True):
+        label = element.get_text(' ', strip=True)[:120] if element.name == 'a' else ''
+        for attr in ('href', 'src', 'data', 'data-src', 'data-url', 'data-pdf',
+                     'data-pdf-url', 'data-download-url', 'content'):
+            if isinstance(element.get(attr), str):
+                add(element[attr], label)
+    # Some official PDF viewer links appear only inside inline JavaScript.
+    raw = html.unescape(response.text).replace('\\/', '/')
+    for token in raw.split(chr(34)):
+        if '.pdf' in token.lower() or ('/api/sitecore/' in token.lower() and 'download' in token.lower()):
+            add(token)
+
     if not candidates:
-        raise RuntimeError('No official PDF candidate found; check detail page')
-    candidates.sort(reverse=True)
-    # Ambiguous links must be reviewed; do not silently choose a historical reprint.
-    if len(candidates) > 1 and candidates[0][0] == candidates[1][0]:
-        raise RuntimeError('Multiple equally plausible PDFs; manual source selection required')
-    pdf_url = candidates[0][1]
-    return pdf_url, fetch(session, pdf_url).content
+        raise RuntimeError('No official PDF URL found in links or embedded viewer data; inspect official page')
+    valid = []
+    for url, score in sorted(candidates.items(), key=lambda x: -x[1])[:12]:
+        try:
+            pdf = fetch(session, url).content
+            if pdf.startswith(b'%PDF') and len(pdf) > 1000:
+                valid.append((score, url, pdf))
+        except requests.RequestException:
+            continue
+    if not valid:
+        raise RuntimeError(f'{len(candidates)} possible official PDF URLs found, but none returned a PDF')
+    valid.sort(key=lambda x: -x[0])
+    if len(valid) > 1 and valid[0][0] == valid[1][0]:
+        raise RuntimeError('Multiple equally plausible official PDFs; manual review required')
+    return valid[0][1], valid[0][2]
 
 def run():
     parser = argparse.ArgumentParser(description='Read-only NT legislation source monitor')
