@@ -53,23 +53,36 @@ document.addEventListener('click',event=>{const button=event.target.closest('[da
    Never changes stored statutory text. Definition boundaries are inferred
    conservatively from original PDF line breaks. */
 function reflowCodeDefinitions(text){
+  // Presentation only. Work from the original, unmodified statutory text.
   const lines=String(text||'').replace(/\r\n?/g,'\n').split('\n');
-  let out='',previous='',lastMarker=false;
   const marker=/^\((?:\d+[A-Za-z]?|[a-z]{1,3}|[ivxlcdm]+)\)$/i;
   const inlineMarker=/^\((?:\d+[A-Za-z]?|[a-z]{1,3}|[ivxlcdm]+)\)\s+/i;
-  const looksLikeDefinition=/^[a-z][a-z\s,\/-]{1,90}?(?:\s+means\b|\s+includes\b|\s*,\s*(?:for|in relation to|see)\b|\s*:\s*$)/i;
-  for(const raw of lines){
-    const line=raw.trim();
+  // Recognise dictionary entries only where the beginning of the source line
+  // (or its continuation on the next line) contains a drafting cue.
+  const definitionCue=/^(?:[A-Za-z][A-Za-z0-9'’/(), -]{0,115}?)(?:\s+means\b|\s+includes?\b|\s+does not include\b|\s+has the meaning\b|\s*,\s*(?:for|see|in relation to)\b|\s*:\s*$)/i;
+  function startsDefinition(i){
+    const line=(lines[i]||'').trim();
+    if(!/^[A-Za-z]/.test(line)||/^(?:for|in relation to|see|section|subsection|part|division|schedule|and|or|but|that|which|where|when|the|a|an)\b/i.test(line))return false;
+    if(definitionCue.test(line))return true;
+    const next=(lines[i+1]||'').trim();
+    if(!next||marker.test(next)||inlineMarker.test(next))return false;
+    return definitionCue.test(line+' '+next);
+  }
+  let out='',previousLine='',lastMarker=false;
+  for(let i=0;i<lines.length;i++){
+    const line=lines[i].trim();
     if(!line){if(out&&!out.endsWith('\n\n'))out+='\n\n';continue;}
-    if(!out){out=line;previous=line;lastMarker=false;continue;}
+    if(!out){out=line;previousLine=line;continue;}
     const isMarker=marker.test(line)||inlineMarker.test(line);
-    const isDefinition=looksLikeDefinition.test(line) && !lastMarker;
-    if(isDefinition){out=out.trimEnd()+'\n\n'+line;}
-    else if(isMarker){out=out.trimEnd()+'\n'+line;}
-    else if(lastMarker){out+=' '+line;}
-    else if(out.endsWith('\n\n')){out+=line;}
-    else{out+=' '+line;}
-    previous=line;lastMarker=marker.test(line);
+    const isDefinition=startsDefinition(i)&&!lastMarker&&
+      // Avoid splitting an unfinished continuation of the previous definition.
+      (/[.:;!?]$/.test(previousLine)||out.endsWith('\n\n')||/^In this Code:$/i.test(previousLine));
+    if(isDefinition)out=out.trimEnd()+'\n\n'+line;
+    else if(isMarker)out=out.trimEnd()+'\n'+line;
+    else if(out.endsWith('\n\n'))out+=line;
+    else out+=' '+line;
+    previousLine=line;
+    lastMarker=marker.test(line);
   }
   return out;
 }
