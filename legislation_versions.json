@@ -41,6 +41,13 @@
     "pdf_url": "https://legislation.nt.gov.au/api/sitecore/Act/PDF?id=11768",
     "sha256": "2e166199edf35b845d4b89b12dc9f4cb604402ad520bbe16479ac522570bafee"
   },
+  "Evidence (National Uniform Legislation) Act 2011": {
+    "name": "Evidence (National Uniform Legislation) Act 2011",
+    "official_page": "https://legislation.nt.gov.au/en/Legislation/EVIDENCE-NATIONAL-UNIFORM-LEGISLATION-ACT-2011",
+    "pdf_bytes": 750396,
+    "pdf_url": "https://legislation.nt.gov.au/api/sitecore/Act/PDF?id=11803",
+    "sha256": "838c9119f357c46d3140e10b1756d7d240a81a1cfc2b11a3054ba07617725383"
+  },
   "Firearms Act 1997": {
     "name": "Firearms Act 1997",
     "official_page": "https://legislation.nt.gov.au/en/Legislation/FIREARMS-ACT-1997",
@@ -54,6 +61,20 @@
     "pdf_bytes": 578091,
     "pdf_url": "https://legislation.nt.gov.au/api/sitecore/Act/PDF?id=11822",
     "sha256": "ced6dfa738d43d3d1f1cc9c3c1ecc203af0ec6addce31de419c2be88431b4845"
+  },
+  "Integrity and Ethics Commissioner Act 2025": {
+    "name": "Integrity and Ethics Commissioner Act 2025",
+    "official_page": "https://legislation.nt.gov.au/en/Legislation/INTEGRITY-AND-ETHICS-COMMISSIONER-ACT-2025",
+    "pdf_bytes": 310799,
+    "pdf_url": "https://legislation.nt.gov.au/api/sitecore/Act/PDF?id=12440",
+    "sha256": "f2630e1570adf90e4d10a027cfb8c0fcbff9738ea677b7792d15a82cc6c014ee"
+  },
+  "Liquor Act 2019": {
+    "name": "Liquor Act 2019",
+    "official_page": "https://legislation.nt.gov.au/en/Legislation/LIQUOR-ACT-2019",
+    "pdf_bytes": 876333,
+    "pdf_url": "https://legislation.nt.gov.au/api/sitecore/Act/PDF?id=12371",
+    "sha256": "815f7205467f93a917b030c95832d59e158fad965342d09d649fdf598248c814"
   },
   "Mental Health and Related Services Act 1998": {
     "name": "Mental Health and Related Services Act 1998",
@@ -111,6 +132,13 @@
     "pdf_url": "https://legislation.nt.gov.au/api/sitecore/Act/PDF?id=11893",
     "sha256": "add4b24b5227b5d872992e24d776addb3684ab934cfde714d4faa695d7716f1d"
   },
+  "Sexual Offences (Evidence and Procedure) Act 1983": {
+    "name": "Sexual Offences (Evidence and Procedure) Act 1983",
+    "official_page": "https://legislation.nt.gov.au/en/Legislation/SEXUAL-OFFENCES-EVIDENCE-AND-PROCEDURE-ACT-1983",
+    "pdf_bytes": 253318,
+    "pdf_url": "https://legislation.nt.gov.au/api/sitecore/Act/PDF?id=11894",
+    "sha256": "7171afe13399098e1de7f8affb779173549c5d109416a86f460ab5e8fbc2b50d"
+  },
   "Summary Offences Act 1923": {
     "name": "Summary Offences Act 1923",
     "official_page": "https://legislation.nt.gov.au/en/Legislation/SUMMARY-OFFENCES-ACT-1923",
@@ -131,6 +159,13 @@
     "pdf_bytes": 642586,
     "pdf_url": "https://legislation.nt.gov.au/api/sitecore/Act/PDF?id=12229",
     "sha256": "2782e6a5fca947608321358e3df6142686d6d95132031d9c783ded0137aed5ce"
+  },
+  "Trespass Act 2023": {
+    "name": "Trespass Act 2023",
+    "official_page": "https://legislation.nt.gov.au/en/Legislation/TRESPASS-ACT-2023",
+    "pdf_bytes": 207023,
+    "pdf_url": "https://legislation.nt.gov.au/api/sitecore/Act/PDF?id=12407",
+    "sha256": "f926c86e16f9b29cd87cd9c313dc79bf0b1907f276221d0d7dcb384d79965871"
   },
   "Weapons Control Act 2001": {
     "name": "Weapons Control Act 2001",
