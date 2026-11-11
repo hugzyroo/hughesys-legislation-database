@@ -51,10 +51,11 @@ jobs:
       - name: Save checked versions for future comparison
         if: always()
         run: |
+          python build_legislation_status.py
           if [ -f legislation_versions.json ]; then
             git config user.name 'github-actions[bot]'
             git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-            git add legislation_versions.json
+            git add legislation_versions.json legislation_status.json legislation_pending_review.json
             if ! git diff --cached --quiet; then
               git commit -m 'Record official NT legislation PDF versions [skip ci]'
               git push
