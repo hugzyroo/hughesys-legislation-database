@@ -13,6 +13,8 @@ from bs4 import BeautifulSoup
 
 BASE = 'https://legislation.nt.gov.au'
 ROOT = Path(__file__).resolve().parent
+DIRECT_PDF_IDS = {'Anti-Discrimination Act 1992': 11606}
+
 HEADERS = {'User-Agent': 'Mozilla/5.0 (compatible; NTActsHubChecker/2.0)', 'Accept': 'text/html,application/pdf,*/*'}
 
 
@@ -54,6 +56,15 @@ def discover_pdf_urls(html, page_url):
 
 
 def check(session, name):
+    # Official API ID supplied for the Anti-Discrimination Act; avoid broken page slug.
+    if name in DIRECT_PDF_IDS:
+        pdf_url = f"{BASE}/api/sitecore/Act/PDF?id={DIRECT_PDF_IDS[name]}"
+        pdf = fetch(session, pdf_url)
+        if not pdf.content.startswith(b'%PDF-') or len(pdf.content) < 1000:
+            raise ValueError(f'Official API returned an invalid PDF for {name}')
+        return {'name': name, 'official_page': f'{BASE}/en/Legislation/ANTI-DISCRIMINATION-ACT-1992',
+                'pdf_url': pdf.url, 'sha256': hashlib.sha256(pdf.content).hexdigest(),
+                'pdf_bytes': len(pdf.content)}
     failures = []
     for slug in slugs(name):
         page = f'{BASE}/en/Legislation/{slug}'
