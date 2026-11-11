@@ -6,6 +6,13 @@
     "pdf_url": "https://legislation.nt.gov.au/api/sitecore/Act/PDF?id=11569",
     "sha256": "bec55261e72923e0160b5274ae89e32446bbd6affc8474cdf903b8b35b2cccd6"
   },
+  "Anti-Discrimination Act 1992": {
+    "name": "Anti-Discrimination Act 1992",
+    "official_page": "https://legislation.nt.gov.au/en/Legislation/ANTI-DISCRIMINATION-ACT-1992",
+    "pdf_bytes": 438834,
+    "pdf_url": "https://legislation.nt.gov.au/api/sitecore/Act/PDF?id=11606",
+    "sha256": "15d4c288664d5301357e7aa16fe1b32f0c567f4f167b9ef435d5ab7a65c3752e"
+  },
   "Bail Act 1982": {
     "name": "Bail Act 1982",
     "official_page": "https://legislation.nt.gov.au/en/Legislation/BAIL-ACT-1982",
