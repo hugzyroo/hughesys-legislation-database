@@ -1,0 +1,65 @@
+name: Check NT Acts for amendments
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '30 0 * * 0'
+permissions:
+  contents: write
+  issues: write
+jobs:
+  check:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install checker dependencies
+        run: pip install -r requirements-checker.txt
+      - name: Compare official consolidated PDFs
+        id: scan
+        continue-on-error: true
+        run: python check_legislation.py
+      - name: Save report as downloadable artifact
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: legislation-check-${{ github.run_number }}
+          path: legislation_check_report.json
+          retention-days: 60
+      - name: Open issue when legislation changed or checks failed
+        if: always()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          python - <<'PY'
+          import json,os,subprocess,pathlib
+          p=pathlib.Path('legislation_check_report.json')
+          if not p.exists():
+              raise SystemExit('Checker failed before creating report; inspect Actions log')
+          r=json.loads(p.read_text()); changes=r['changes']; errors=r['errors']
+          if not changes and not errors:raise SystemExit(0)
+          lines=['Automated NT legislation check: '+r['checked_at_utc'],'',
+                 'The published app has NOT been modified. Review the official PDF before changing legal text.','']
+          for a in changes:lines.extend(['- **CHANGED:** '+a['name']+' — '+a['official_page']])
+          for a in errors:lines.extend(['- **CHECK FAILED:** '+a['name']+' — '+a['error']])
+          lines+=['','Download the legislation-check artifact from this Actions run for full details.']
+          title='NT legislation check: '+str(len(changes))+' changed, '+str(len(errors))+' errors'
+          subprocess.run(['gh','issue','create','--title',title,'--body','\n'.join(lines)],check=True)
+          PY
+      - name: Save checked versions for future comparison
+        if: always()
+        run: |
+          if [ -f legislation_versions.json ]; then
+            git config user.name 'github-actions[bot]'
+            git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+            git add legislation_versions.json
+            if ! git diff --cached --quiet; then
+              git commit -m 'Record official NT legislation PDF versions [skip ci]'
+              git push
+            fi
+          fi
+      - name: Fail if checks incomplete
+        if: steps.scan.outcome != 'success'
+        run: exit 1
