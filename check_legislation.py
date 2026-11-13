@@ -13,7 +13,7 @@ from bs4 import BeautifulSoup
 
 BASE = 'https://legislation.nt.gov.au'
 ROOT = Path(__file__).resolve().parent
-DIRECT_PDF_IDS = {'Anti-Discrimination Act 1992': 11606}
+DIRECT_PDF_IDS = {'Anti-Discrimination Act 1992': 11606, 'Surveillance Devices Act 2007': 12191}
 
 HEADERS = {'User-Agent': 'Mozilla/5.0 (compatible; NTActsHubChecker/2.0)', 'Accept': 'text/html,application/pdf,*/*'}
 
@@ -62,7 +62,7 @@ def check(session, name):
         pdf = fetch(session, pdf_url)
         if not pdf.content.startswith(b'%PDF-') or len(pdf.content) < 1000:
             raise ValueError(f'Official API returned an invalid PDF for {name}')
-        return {'name': name, 'official_page': f'{BASE}/en/Legislation/ANTI-DISCRIMINATION-ACT-1992',
+        return {'name': name, 'official_page': f'{BASE}/en/Legislation/{re.sub(r"[^A-Z0-9]+", "-", name.upper()).strip("-")}',
                 'pdf_url': pdf.url, 'sha256': hashlib.sha256(pdf.content).hexdigest(),
                 'pdf_bytes': len(pdf.content)}
     failures = []
