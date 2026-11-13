@@ -153,6 +153,13 @@
     "pdf_url": "https://legislation.nt.gov.au/api/sitecore/Act/PDF?id=11915",
     "sha256": "a2045f74df7e335ea7fcf498ab97b4c38e9bd21ba06102b0241c89d70bc6c16a"
   },
+  "Surveillance Devices Act 2007": {
+    "name": "Surveillance Devices Act 2007",
+    "official_page": "https://legislation.nt.gov.au/en/Legislation/SURVEILLANCE-DEVICES-ACT-2007",
+    "pdf_bytes": 415180,
+    "pdf_url": "https://legislation.nt.gov.au/api/sitecore/Act/PDF?id=12191",
+    "sha256": "876106169f37bd6bcff764377fcbf8660f6819e4dab8097582216eda78ef5202"
+  },
   "Tobacco Control Act 2002": {
     "name": "Tobacco Control Act 2002",
     "official_page": "https://legislation.nt.gov.au/en/Legislation/TOBACCO-CONTROL-ACT-2002",
